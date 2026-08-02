@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!--
+    HTTP host (inbound adapter). Thin: it maps HTTP <-> the normalized contracts and drives
+    IMessageGateway. It references the stub adapter only to wire it at the composition root; it must
+    never reference an AI-provider SDK directly (fitness-tested).
+  -->
+  <PropertyGroup>
+    <RootNamespace>Portic.Gateway</RootNamespace>
+    <UserSecretsId>portic-gateway</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Portic.Core\Portic.Core.csproj" />
+    <ProjectReference Include="..\Portic.Providers.Stub\Portic.Providers.Stub.csproj" />
+  </ItemGroup>
+
+</Project>

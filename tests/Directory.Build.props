@@ -1,0 +1,11 @@
+<Project>
+
+  <!-- Inherit the solution-wide settings, then relax rules that don't fit test code. -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <PropertyGroup>
+    <!-- Underscored, sentence-style test names are the xUnit convention and aid readability. -->
+    <NoWarn>$(NoWarn);CA1707</NoWarn>
+  </PropertyGroup>
+
+</Project>

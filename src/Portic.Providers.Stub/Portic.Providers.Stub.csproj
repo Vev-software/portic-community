@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Provider ADAPTER: the local "stub" (echo) provider. Requires no API key and no network, so a clean
+    clone can serve POST /v1/messages immediately. This is the ONLY kind of project permitted to
+    reference an AI-provider SDK (the fitness test allows provider-SDK references only under
+    Portic.Providers.*). The stub itself uses no SDK — it is the replaceable reference adapter.
+  -->
+  <PropertyGroup>
+    <RootNamespace>Portic.Providers.Stub</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Portic.Core\Portic.Core.csproj" />
+  </ItemGroup>
+
+</Project>

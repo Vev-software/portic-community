@@ -1,0 +1,20 @@
+{
+  "name": "portic",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:1-9.0",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit"
+      ]
+    }
+  },
+  "postCreateCommand": "dotnet restore Portic.sln",
+  "remoteEnv": {
+    "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+    "DOTNET_NOLOGO": "1"
+  },
+  "forwardPorts": [5187]
+}

@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-lint-fitness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET (pinned by global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Portic.sln
+
+      # Build enforces analyzers + TreatWarningsAsErrors (Directory.Build.props).
+      - name: Build
+        run: dotnet build Portic.sln -c Release --no-restore
+
+      # Lint: formatting + style must be clean. Locally, `dotnet format Portic.sln` fixes them.
+      - name: Lint (format verify)
+        run: dotnet format Portic.sln --verify-no-changes --no-restore
+
+      # Full suite: unit + integration + architecture/fitness.
+      - name: Test
+        run: dotnet test Portic.sln -c Release --no-build
+
+      # Fitness run again in isolation so a red guardrail is unmistakable in the CI log.
+      - name: Fitness (architecture guardrails)
+        run: dotnet test tests/Portic.Architecture.Tests/Portic.Architecture.Tests.csproj -c Release --no-build

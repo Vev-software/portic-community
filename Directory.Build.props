@@ -1,0 +1,21 @@
+<Project>
+
+  <!--
+    Solution-wide build settings. Portic is a ports-and-adapters gateway; these defaults keep every
+    project consistent and turn analyzer/style violations into build errors so that `dotnet build`
+    and CI enforce the same bar. See AGENTS.md for the non-negotiable guardrails.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>13.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Deterministic>true</Deterministic>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>

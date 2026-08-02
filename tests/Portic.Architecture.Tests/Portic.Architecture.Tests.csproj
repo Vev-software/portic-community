@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Fitness / architecture tests. These enforce the AGENTS.md guardrails (never disable them). They
+    reference every runtime project so those assemblies are present in the output directory for the
+    assembly-level boundary scan.
+  -->
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Portic.Core\Portic.Core.csproj" />
+    <ProjectReference Include="..\..\src\Portic.Gateway\Portic.Gateway.csproj" />
+    <ProjectReference Include="..\..\src\Portic.Providers.Stub\Portic.Providers.Stub.csproj" />
+  </ItemGroup>
+
+</Project>
