@@ -17,6 +17,22 @@ dotnet publish src/Portic.Gateway -c Release      # produce a deployable build
 
 Container/host should set `ASPNETCORE_URLS` (e.g. `http://0.0.0.0:8080`) to control the bind address.
 
+### Container image
+
+Images are published to GHCR by `.github/workflows/publish-image.yml` (on pushes to `main` and `v*`
+tags): `ghcr.io/vev-software/portic` (`:latest`, `:main`, `:sha-…`, and `:X.Y.Z` on tags). The image
+is chiseled and runs **non-root**, binding `:8080` by default. See ADR-0004 for the packaging→Fabric
+boundary (signing/SBOM/promotion are deferred to a Fabric packaging contract).
+
+```bash
+docker run --rm -p 8080:8080 ghcr.io/vev-software/portic:latest
+curl -X POST http://localhost:8080/v1/messages \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"stub-echo","messages":[{"role":"user","content":"hello"}]}'
+```
+
+To build locally: `docker build -t portic-gateway . && docker run --rm -p 8080:8080 portic-gateway`.
+
 ## Configuration
 
 | Setting | Env var | Default | Notes |

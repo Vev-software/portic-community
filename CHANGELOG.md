@@ -16,8 +16,11 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/).
 - Content-free audit (`IAuditSink` + `LoggingAuditSink`) and `ActivitySource` telemetry.
 - Scaffolding: `global.json` (pinned .NET 9), `Directory.Build.props` (analyzers + warnings-as-errors),
   `.editorconfig`, CI workflow (build + test + lint + fitness), devcontainer.
+- Container packaging: multi-stage `Dockerfile` (chiseled, non-root, `:8080`), `.dockerignore`, and a
+  `publish-image` workflow that pushes to `ghcr.io/vev-software/portic` on `main`/`v*` (ADR-0004).
 - Docs: ADR-0001 (SPI → `portic-sdk`), ADR-0002 (audit/telemetry are Fabric contracts), ADR-0003
-  (LICENSE-file discrepancy), ops doc, threat-model note, compatibility statement.
+  (LICENSE-file discrepancy), ADR-0004 (container packaging is a Fabric concern), ops doc,
+  threat-model note, compatibility statement.
 
 ### Changed
 

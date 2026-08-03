@@ -45,6 +45,18 @@ Response (served by the local stub — no API key, no network):
 
 `GET /health` returns `{"status":"ok"}`.
 
+### Or run the container
+
+Published to GHCR on every push to `main` (and on `v*` tags). Binds `:8080`, runs non-root:
+
+```bash
+docker run --rm -p 8080:8080 ghcr.io/vev-software/portic:latest
+# then POST to http://localhost:8080/v1/messages as above
+```
+
+Build it yourself with `docker build -t portic-gateway .`. See
+[ADR-0004](./docs/adr/0004-container-packaging-is-a-fabric-concern.md) for the packaging→Fabric boundary.
+
 ## Build, test, lint, fitness
 
 ```bash

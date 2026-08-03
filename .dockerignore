@@ -1,0 +1,13 @@
+# Keep the build context small and reproducible: the Dockerfile copies exactly what it needs.
+**/bin/
+**/obj/
+.git/
+.github/
+.devcontainer/
+.vs/
+tests/
+docs/
+*.md
+LICENSE
+Dockerfile
+.dockerignore
