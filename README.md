@@ -1,7 +1,10 @@
-# Portic
+# Portic · Community Edition
 
 Portic is VEV's **AI gateway & control plane**: one governed, portable gateway for every model.
-This is the public community runtime (AGPL-3.0). Agent/contributor guardrails live in
+This repository is the free, self-hostable **community runtime** (`portic-community`, AGPL-3.0);
+the paid modules, hosted management and commercial integrations live in
+**[`portic-enterprise`](https://github.com/Vev-software/portic-enterprise)** (private) and
+compose onto this runtime through Fabric entitlements. Agent/contributor guardrails live in
 [`AGENTS.md`](./AGENTS.md) — read it before changing anything.
 
 The gateway is built ports-and-adapters style: every model call goes through a provider **SPI**, and
@@ -50,7 +53,7 @@ Response (served by the local stub — no API key, no network):
 Published to GHCR on every push to `main` (and on `v*` tags). Binds `:8080`, runs non-root:
 
 ```bash
-docker run --rm -p 8080:8080 ghcr.io/vev-software/portic:latest
+docker run --rm -p 8080:8080 ghcr.io/vev-software/portic-community:latest
 # then POST to http://localhost:8080/v1/messages as above
 ```
 
