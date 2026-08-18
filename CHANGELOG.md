@@ -21,6 +21,8 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/).
 - Docs: ADR-0001 (SPI → `portic-sdk`), ADR-0002 (audit/telemetry are Fabric contracts), ADR-0003
   (LICENSE-file discrepancy), ADR-0004 (container packaging is a Fabric concern), ops doc,
   threat-model note, compatibility statement.
+- Docs: Atlas Community integration guide (`docs/integrations/atlas-community.md`) with gateway
+  contract, authentication model, and example curl request. Closes #21.
 
 ### Changed
 

@@ -80,6 +80,10 @@ dotnet test tests/Portic.Architecture.Tests   # fitness/architecture guardrails 
 | `tests/Portic.Gateway.IntegrationTests` | Boots the host and drives `POST /v1/messages`. |
 | `tests/Portic.Architecture.Tests` | **Fitness tests** — enforce the "no provider SDK outside an adapter" boundary. |
 
+## Integrations
+
+- [Atlas Community](./docs/integrations/atlas-community.md) — gateway contract, authentication model, and example requests
+
 ## Guardrails
 
 The headline guardrail — *AI-native, never vendor-bound* — is machine-enforced: a fitness test fails
