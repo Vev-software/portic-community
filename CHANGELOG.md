@@ -23,8 +23,16 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/).
   threat-model note, compatibility statement.
 - Docs: Atlas Community integration guide (`docs/integrations/atlas-community.md`) with gateway
   contract, authentication model, and example curl request. Closes #21.
+- Fail-static entitlement seam (`Portic.Core.Entitlements`): `PaidCapabilityGate` (`Require`/
+  `Evaluate`), the reserved paid capability taxonomy (`PorticCapabilities`), and Community's
+  always-deny `CommunityEntitlementService`, consuming the Fabric entitlement contract
+  (`Vev.Fabric.Contracts`). A `SingleTenantRequestContextAccessor` placeholder stands in for real
+  Fabric identity. Fitness test bans `if (plan == …)` anywhere in `src/`. Closes #16.
 
 ### Changed
+
+- Bumped to **.NET 10** (from .NET 9) to consume `Vev.Fabric.Contracts`, which publishes a
+  `net10.0`-only build.
 
 - Root `LICENSE` set to **GNU AGPL-3.0** (verbatim FSF text), matching AGENTS.md. Resolves the earlier
   Apache-2.0/AGPL-3.0 mismatch (ADR-0003).

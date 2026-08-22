@@ -15,6 +15,10 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+
+    <!-- Entitlement contract (fabric#4): tenant/principal context, CapabilityId, EntitlementDecision,
+         IEntitlementService. Requires net10.0 (Vev.Fabric.Contracts has no earlier-TFM build). -->
+    <PackageReference Include="Vev.Fabric.Contracts" Version="0.1.2" />
   </ItemGroup>
 
 </Project>
