@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Portic.Core;
 using Portic.Core.Contracts;
+using Portic.Core.Governance;
 using Portic.Core.Providers;
 
 namespace Portic.Gateway.Endpoints;
@@ -22,14 +23,14 @@ public static class MessagesEndpoints
         return app;
     }
 
-    private static async Task<Results<Ok<ChatCompletion>, BadRequest<ProblemDetails>>> HandleMessagesAsync(
+    private static async Task<Results<Ok<ChatCompletion>, ProblemHttpResult>> HandleMessagesAsync(
         ChatRequest request,
         IMessageGateway gateway,
         CancellationToken cancellationToken)
     {
         if (request is null || request.Messages is null || request.Messages.Count == 0)
         {
-            return TypedResults.BadRequest(Problem("messages_required", "At least one message is required."));
+            return Problem("messages_required", "At least one message is required.", StatusCodes.Status400BadRequest);
         }
 
         try
@@ -39,14 +40,15 @@ public static class MessagesEndpoints
         }
         catch (ProviderNotFoundException ex)
         {
-            return TypedResults.BadRequest(Problem("provider_not_found", ex.Message));
+            return Problem("provider_not_found", ex.Message, StatusCodes.Status400BadRequest);
+        }
+        catch (PolicyDeniedException ex)
+        {
+            var status = ex.ReasonCode == "quota_exceeded" ? StatusCodes.Status429TooManyRequests : StatusCodes.Status403Forbidden;
+            return Problem(ex.ReasonCode, ex.Message, status);
         }
     }
 
-    private static ProblemDetails Problem(string reasonCode, string detail) => new()
-    {
-        Title = reasonCode,
-        Detail = detail,
-        Status = StatusCodes.Status400BadRequest,
-    };
+    private static ProblemHttpResult Problem(string reasonCode, string detail, int status) =>
+        TypedResults.Problem(detail: detail, statusCode: status, title: reasonCode);
 }

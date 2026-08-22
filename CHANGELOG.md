@@ -28,6 +28,12 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/).
   always-deny `CommunityEntitlementService`, consuming the Fabric entitlement contract
   (`Vev.Fabric.Contracts`). A `SingleTenantRequestContextAccessor` placeholder stands in for real
   Fabric identity. Fitness test bans `if (plan == …)` anywhere in `src/`. Closes #16.
+- Granular core governance (`Portic.Core.Governance`): a configurable model allowlist and per-team
+  daily quota enforced before routing (`GovernancePolicyGate`, `PolicyOptions`), fail-safe on
+  internal error, denying `403 model_not_allowed` / `429 quota_exceeded`. `IContentRedactor` /
+  `RegexPiiRedactor` ships as a tested, ready-to-consume PII-redaction port ahead of the planned
+  usage/audit view (#17) — no current call site, since no current path logs content. Free-tier, not
+  gated by the entitlement seam. Closes #18.
 
 ### Changed
 

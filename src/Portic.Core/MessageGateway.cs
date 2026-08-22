@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Portic.Core.Contracts;
+using Portic.Core.Governance;
 using Portic.Core.Observability;
 using Portic.Core.Providers;
 using Portic.Core.Routing;
@@ -8,11 +9,12 @@ using Portic.Core.Routing;
 namespace Portic.Core;
 
 /// <summary>
-/// Orchestrates one message request: route → provider adapter → normalized completion, wrapped in a
-/// telemetry span and a content-free audit event. All provider-specific behavior lives behind
-/// <see cref="IChatProvider"/>; this class never references a provider SDK.
+/// Orchestrates one message request: policy → route → provider adapter → normalized completion,
+/// wrapped in a telemetry span and a content-free audit event. All provider-specific behavior lives
+/// behind <see cref="IChatProvider"/>; this class never references a provider SDK.
 /// </summary>
 public sealed partial class MessageGateway(
+    GovernancePolicyGate policy,
     IProviderRouter router,
     IAuditSink auditSink,
     ILogger<MessageGateway> logger) : IMessageGateway
@@ -22,6 +24,19 @@ public sealed partial class MessageGateway(
         ArgumentNullException.ThrowIfNull(request);
 
         using var activity = PorticTelemetry.ActivitySource.StartActivity("ai.message");
+
+        try
+        {
+            policy.Enforce(request.Model);
+        }
+        catch (PolicyDeniedException ex)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            await auditSink.RecordAsync(
+                Failure(request.Model, provider: "n/a", ex.ReasonCode),
+                cancellationToken).ConfigureAwait(false);
+            throw;
+        }
 
         IChatProvider provider;
         try

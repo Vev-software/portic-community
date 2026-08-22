@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Portic.Core.Configuration;
 using Portic.Core.Entitlements;
+using Portic.Core.Governance;
 using Portic.Core.Observability;
 using Portic.Core.Routing;
 using Vev.Fabric.Contracts.Entitlements;
@@ -23,6 +24,10 @@ public static class CoreServiceCollectionExtensions
             .Bind(configuration.GetSection(GatewayOptions.SectionName))
             .ValidateOnStart();
 
+        services.AddOptions<PolicyOptions>()
+            .Bind(configuration.GetSection(PolicyOptions.SectionName))
+            .ValidateOnStart();
+
         services.AddSingleton<IProviderRouter, ProviderRouter>();
         services.AddSingleton<IAuditSink, LoggingAuditSink>();
         services.AddSingleton<IMessageGateway, MessageGateway>();
@@ -33,6 +38,13 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<IRequestContextAccessor, SingleTenantRequestContextAccessor>();
         services.AddSingleton<IEntitlementService, CommunityEntitlementService>();
         services.AddSingleton<PaidCapabilityGate>();
+
+        // Core governance policy (portic-community#18): model allowlist + per-team quota. Free-tier,
+        // not entitlement-gated -- see GovernancePolicyGate's own remarks on why this is distinct
+        // from PaidCapabilityGate.
+        services.AddSingleton<IContentRedactor, RegexPiiRedactor>();
+        services.AddSingleton<ITeamQuotaEnforcer, InMemoryTeamQuotaEnforcer>();
+        services.AddSingleton<GovernancePolicyGate>();
 
         return services;
     }
