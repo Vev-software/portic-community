@@ -28,9 +28,10 @@ namespace migration.
 
 ## Platform
 
-- Runtime: .NET 9 (`net9.0`), SDK pinned via `global.json` (`9.0.316`, roll-forward to newer 9.0.x
-  features). No dependency on OS-specific APIs.
-- Dependencies: `Microsoft.Extensions.*` and ASP.NET 9.x (MIT). No AGPL-incompatible dependency is
+- Runtime: .NET 10 (`net10.0`), SDK pinned via `global.json` (`10.0.100`, roll-forward to newer 10.0.x
+  features). No dependency on OS-specific APIs. Bumped from .NET 9 to consume the published
+  `Vev.Fabric.Contracts` package, which targets `net10.0` only.
+- Dependencies: `Microsoft.Extensions.*` and ASP.NET 10.x (MIT). No AGPL-incompatible dependency is
   present (see ADR-0003 for the open `LICENSE`-file question).
 
 ## Stability level

@@ -20,7 +20,7 @@ HTTP  ──►  Portic.Gateway  ──►  IMessageGateway ──► IProviderR
 
 ## Ten-minute local run
 
-Prerequisites: the **.NET 9 SDK** (pinned in `global.json`). Then, from the repo root:
+Prerequisites: the **.NET 10 SDK** (pinned in `global.json`). Then, from the repo root:
 
 ```bash
 dotnet run --project src/Portic.Gateway

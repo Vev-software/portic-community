@@ -6,7 +6,7 @@
 # local packaging platform — see docs/adr/0004-container-packaging-is-a-fabric-concern.md.
 
 # ---- build ----
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Restore against the project graph first, so the (slow) restore layer caches across source changes.
@@ -23,7 +23,7 @@ RUN dotnet publish src/Portic.Gateway/Portic.Gateway.csproj -c Release -o /app -
 # ---- runtime ----
 # Chiseled image: no shell/package manager, minimal surface, runs as non-root (UID 1654) and binds
 # :8080 via ASPNETCORE_HTTP_PORTS by default.
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-noble-chiseled AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled AS runtime
 WORKDIR /app
 COPY --from=build /app ./
 

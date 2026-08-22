@@ -9,7 +9,7 @@ system-prompt-level guidance; the constraints below are non-negotiable.
 
 ## Stack & versions
 
-- Language / runtime: **.NET 9 / C# 13** (SDK pinned in `global.json` to `9.0.316`, `rollForward: latestFeature`)
+- Language / runtime: **.NET 10 / C# 14** (SDK pinned in `global.json` to `10.0.100`, `rollForward: latestFeature`)
 - Framework(s): **ASP.NET Core Minimal APIs** (host); **xUnit** (tests)
 - Package manager: **NuGet** (`dotnet` CLI; package versions pinned in each `.csproj`)
 - Datastore(s): **none** in core today. The request path must never block on a control-plane DB

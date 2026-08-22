@@ -14,7 +14,7 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/).
 - **Fitness harness** (`Portic.Architecture.Tests`) enforcing "no AI-provider SDK outside a provider
   adapter" at both the package-reference and compiled-assembly level.
 - Content-free audit (`IAuditSink` + `LoggingAuditSink`) and `ActivitySource` telemetry.
-- Scaffolding: `global.json` (pinned .NET 9), `Directory.Build.props` (analyzers + warnings-as-errors),
+- Scaffolding: `global.json` (pinned .NET 10), `Directory.Build.props` (analyzers + warnings-as-errors),
   `.editorconfig`, CI workflow (build + test + lint + fitness), devcontainer.
 - Container packaging: multi-stage `Dockerfile` (chiseled, non-root, `:8080`), `.dockerignore`, and a
   `publish-image` workflow that pushes to `ghcr.io/vev-software/portic-community` on `main`/`v*` (ADR-0004).
