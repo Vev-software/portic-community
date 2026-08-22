@@ -13,8 +13,8 @@
   `maxTokens` (int, optional), `provider` (string, optional).
 - Response: `id`, `model`, `provider`, `message {role, content}`, `usage {inputTokens, outputTokens,
   totalTokens}`.
-- Errors: `400` `ProblemDetails` with a `title` reason code (`messages_required`,
-  `provider_not_found`).
+- Errors: `ProblemDetails` with a `title` reason code: `400` (`messages_required`, `provider_not_found`),
+  `403` (`model_not_allowed`), `429` (`quota_exceeded`).
 
 Clients should ignore unknown fields to remain forward-compatible.
 
@@ -41,7 +41,30 @@ Tenant/principal identity is currently a fixed single-tenant placeholder
 separate, later contract to consume; swapping it in is a DI registration change, not a call-site
 change (mirrors the audit/telemetry placeholder pattern in ADR-0002).
 
-## Platform
+## Governance policy
+
+`Portic.Core.Governance` enforces core, free-tier gateway governance ahead of routing:
+
+- **Model allowlist** (`Portic:Policy:AllowedModels`) — empty (the default) permits every model,
+  matching today's behavior. A configured, non-empty list is a strict allowlist; a request for a
+  model not on it is denied `403 model_not_allowed`.
+- **Per-team quota** (`Portic:Policy:TeamDailyQuotas`) — a team with no entry is unlimited. A team is
+  resolved from the principal's `team` claim, falling back to the tenant when absent (today: the
+  single-tenant placeholder). Exceeding the configured daily count denies `429 quota_exceeded`.
+  Counting is in-process and resets on restart — a durable, shared quota store is hosted/enterprise
+  scope, not this edition's.
+- Both checks are **fail-safe**: an internal error in quota evaluation denies rather than silently
+  passing the request through.
+
+This is distinct from the entitlement seam below: governance/policy is core (free), not
+entitlement-gated (`13-Portic-Roadmap.md`).
+
+**PII redaction** (`IContentRedactor` / `RegexPiiRedactor`) ships as a tested, ready-to-consume port
+— there is no current call site, because no current code path persists or displays prompt/completion
+content (the audit event is content-free by design). It exists ahead of the planned usage/audit view
+(portic-community#17), so that feature is required to redact before it can log anything.
+
+## Entitlement seam
 
 - Runtime: .NET 10 (`net10.0`), SDK pinned via `global.json` (`10.0.100`, roll-forward to newer 10.0.x
   features). No dependency on OS-specific APIs. Bumped from .NET 9 to consume the published
