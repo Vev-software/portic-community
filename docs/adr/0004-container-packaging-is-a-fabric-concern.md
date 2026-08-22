@@ -19,7 +19,7 @@ this repo should be able to `docker run` the gateway without assembling packagin
 Ship a **minimal, standard** container image and GHCR publish pipeline in this repo as an interim,
 and propose the Fabric packaging contract to supersede the policy pieces:
 
-- `Dockerfile`: multi-stage, chiseled non-root ASP.NET 9 runtime, no app-specific packaging platform.
+- `Dockerfile`: multi-stage, chiseled non-root ASP.NET 10 runtime, no app-specific packaging platform.
 - `.github/workflows/publish-image.yml`: builds and pushes to `ghcr.io/<owner>/portic` on pushes to
   `main` and on `v*` tags, authenticating with the built-in `GITHUB_TOKEN` (no new secret).
 - The image links back to the repo via `org.opencontainers.image.source` so provenance is discoverable.

@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Portic.Core.Configuration;
+using Portic.Core.Entitlements;
 using Portic.Core.Observability;
 using Portic.Core.Routing;
+using Vev.Fabric.Contracts.Entitlements;
 
 namespace Portic.Core.DependencyInjection;
 
@@ -24,6 +26,13 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<IProviderRouter, ProviderRouter>();
         services.AddSingleton<IAuditSink, LoggingAuditSink>();
         services.AddSingleton<IMessageGateway, MessageGateway>();
+
+        // Entitlement seam (engineering#3): Community ships the fail-static, empty-grant-set
+        // evaluator and a single-tenant identity placeholder. Swapping either for a real Fabric
+        // identity/entitlement source is a registration change here, not a call-site change.
+        services.AddSingleton<IRequestContextAccessor, SingleTenantRequestContextAccessor>();
+        services.AddSingleton<IEntitlementService, CommunityEntitlementService>();
+        services.AddSingleton<PaidCapabilityGate>();
 
         return services;
     }

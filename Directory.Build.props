@@ -6,8 +6,8 @@
     and CI enforce the same bar. See AGENTS.md for the non-negotiable guardrails.
   -->
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <LangVersion>13.0</LangVersion>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
