@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Portic.Core.Configuration;
+using Portic.Core.Costing;
 using Portic.Core.Entitlements;
 using Portic.Core.Governance;
 using Portic.Core.Observability;
@@ -41,10 +42,16 @@ public sealed class MessageGatewayAuditTests
             Task.FromResult(complete(request));
     }
 
+    private sealed class FixedCostEstimator(UsageCostEstimate estimate) : IUsageCostEstimator
+    {
+        public UsageCostEstimate Estimate(UsageCostEstimationInput input) => estimate;
+    }
+
     private static MessageGateway CreateGateway(
         RecordingAuditSink sink,
         IRequestContextAccessor? context = null,
         IReadOnlyList<string>? allowedModels = null,
+        IUsageCostEstimator? costEstimator = null,
         params IChatProvider[] providers)
     {
         var policy = new GovernancePolicyGate(
@@ -58,6 +65,7 @@ public sealed class MessageGatewayAuditTests
         return new MessageGateway(
             policy,
             router,
+            costEstimator ?? new UnknownUsageCostEstimator(),
             context ?? new SingleTenantRequestContextAccessor(),
             sink,
             NullLogger<MessageGateway>.Instance);
@@ -101,8 +109,42 @@ public sealed class MessageGatewayAuditTests
         Assert.Equal(AuditIdentityState.External, audit.IdentityState);
         Assert.Equal(AuditContentState.Withheld, audit.RequestContentState);
         Assert.Equal(AuditContentState.Withheld, audit.ResponseContentState);
+        Assert.Equal(AuditCostEstimationStatus.UnknownPricing, audit.CostEstimationStatus);
+        Assert.Null(audit.EstimatedCost);
+        Assert.Null(audit.EstimatedCostCurrency);
+        Assert.Equal(UnknownUsageCostEstimator.DefaultSource, audit.CostEstimationSource);
         Assert.True(audit.LatencyMs >= 0);
         Assert.Null(audit.ReasonCode);
+    }
+
+    [Fact]
+    public async Task Completed_calls_can_emit_known_estimated_cost_metadata()
+    {
+        var sink = new RecordingAuditSink();
+        var provider = new FixedProvider("stub", request => new ChatCompletion
+        {
+            Id = "completion-1",
+            Model = request.Model,
+            Provider = "stub",
+            Message = new ChatMessage { Role = "assistant", Content = "echo: ping" },
+            Usage = new TokenUsage { InputTokens = 2, OutputTokens = 3 },
+        });
+        var estimator = new FixedCostEstimator(new UsageCostEstimate
+        {
+            Status = AuditCostEstimationStatus.Estimated,
+            Amount = 0.00125m,
+            Currency = "USD",
+            Source = "test-price-sheet",
+        });
+        var gateway = CreateGateway(sink, costEstimator: estimator, providers: [provider]);
+
+        await gateway.SendAsync(Request());
+
+        var audit = Assert.Single(sink.Events);
+        Assert.Equal(AuditCostEstimationStatus.Estimated, audit.CostEstimationStatus);
+        Assert.Equal(0.00125m, audit.EstimatedCost);
+        Assert.Equal("USD", audit.EstimatedCostCurrency);
+        Assert.Equal("test-price-sheet", audit.CostEstimationSource);
     }
 
     [Fact]
@@ -126,6 +168,10 @@ public sealed class MessageGatewayAuditTests
         Assert.Equal(AuditIdentityState.Placeholder, audit.IdentityState);
         Assert.Equal(AuditContentState.Withheld, audit.RequestContentState);
         Assert.Equal(AuditContentState.Withheld, audit.ResponseContentState);
+        Assert.Equal(AuditCostEstimationStatus.NotComputed, audit.CostEstimationStatus);
+        Assert.Null(audit.EstimatedCost);
+        Assert.Null(audit.EstimatedCostCurrency);
+        Assert.Equal("not-computed", audit.CostEstimationSource);
         Assert.True(audit.LatencyMs >= 0);
         Assert.Null(audit.InputTokens);
         Assert.Null(audit.OutputTokens);
@@ -154,6 +200,7 @@ public sealed class MessageGatewayAuditTests
         Assert.Equal("model_not_allowed", audit.ReasonCode);
         Assert.Equal("POST /v1/messages", audit.Route);
         Assert.Equal(AuditIdentityState.Placeholder, audit.IdentityState);
+        Assert.Equal(AuditCostEstimationStatus.NotComputed, audit.CostEstimationStatus);
         Assert.True(audit.LatencyMs >= 0);
     }
 

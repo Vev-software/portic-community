@@ -1,3 +1,5 @@
+using Portic.Core.Costing;
+
 namespace Portic.Core.Observability;
 
 public enum AuditIdentityState
@@ -55,6 +57,15 @@ public sealed record AuditEvent
     public int? InputTokens { get; init; }
 
     public int? OutputTokens { get; init; }
+
+    /// <summary>Estimate status; never infer "zero cost" from a missing estimate.</summary>
+    public required AuditCostEstimationStatus CostEstimationStatus { get; init; }
+
+    public decimal? EstimatedCost { get; init; }
+
+    public string? EstimatedCostCurrency { get; init; }
+
+    public required string CostEstimationSource { get; init; }
 
     /// <summary>Machine-readable reason code on failure (e.g. "provider_not_found"), else null.</summary>
     public string? ReasonCode { get; init; }

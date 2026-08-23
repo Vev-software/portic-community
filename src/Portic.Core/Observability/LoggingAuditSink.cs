@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Portic.Core.Costing;
 
 namespace Portic.Core.Observability;
 
@@ -24,6 +25,10 @@ public sealed partial class LoggingAuditSink(ILogger<LoggingAuditSink> logger) :
             auditEvent.PrincipalId,
             auditEvent.RequestContentState,
             auditEvent.ResponseContentState,
+            auditEvent.CostEstimationStatus,
+            auditEvent.EstimatedCost,
+            auditEvent.EstimatedCostCurrency,
+            auditEvent.CostEstimationSource,
             auditEvent.ReasonCode,
             auditEvent.InputTokens,
             auditEvent.OutputTokens);
@@ -34,7 +39,7 @@ public sealed partial class LoggingAuditSink(ILogger<LoggingAuditSink> logger) :
     [LoggerMessage(
         EventId = 1000,
         Level = LogLevel.Information,
-        Message = "audit {EventType} route={Route} provider={Provider} model={Model} outcome={Outcome} latencyMs={LatencyMs} identityState={IdentityState} tenant={TenantId} principal={PrincipalId} requestContentState={RequestContentState} responseContentState={ResponseContentState} reason={ReasonCode} tokensIn={InputTokens} tokensOut={OutputTokens}")]
+        Message = "audit {EventType} route={Route} provider={Provider} model={Model} outcome={Outcome} latencyMs={LatencyMs} identityState={IdentityState} tenant={TenantId} principal={PrincipalId} requestContentState={RequestContentState} responseContentState={ResponseContentState} costStatus={CostEstimationStatus} estimatedCost={EstimatedCost} currency={EstimatedCostCurrency} costSource={CostEstimationSource} reason={ReasonCode} tokensIn={InputTokens} tokensOut={OutputTokens}")]
     private static partial void Audit(
         ILogger logger,
         string eventType,
@@ -48,6 +53,10 @@ public sealed partial class LoggingAuditSink(ILogger<LoggingAuditSink> logger) :
         string principalId,
         AuditContentState requestContentState,
         AuditContentState responseContentState,
+        AuditCostEstimationStatus costEstimationStatus,
+        decimal? estimatedCost,
+        string? estimatedCostCurrency,
+        string costEstimationSource,
         string? reasonCode,
         int? inputTokens,
         int? outputTokens);

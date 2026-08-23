@@ -59,7 +59,11 @@ that is logged.
   listener/exporter in your host. See ADR-0002.
 - **Audit:** structured `audit ai.message.completed|failed` log records (EventId 1000) with
   route/provider/model/outcome/reason/token counts, latency, tenant/principal ids, placeholder-vs-external
-  identity state, and explicit request/response content-state flags — **no message content**.
+  identity state, explicit request/response content-state flags, and cost-estimate metadata
+  (`Estimated`, `UnknownPricing`, or `NotComputed`) — **no message content**.
+- **Cost semantics:** any monetary figure in Community audit metadata is an **estimate**, not invoice
+  truth. Estimates must later be reconciled against provider invoices; unknown pricing is emitted
+  explicitly instead of as an implied zero.
 - **What is never emitted:** prompt or completion text, and any secret. Verified by design
   (`AuditEvent` has no content field) and by the threat model.
 - **Community identity boundary:** Community currently emits the fixed single-tenant placeholder

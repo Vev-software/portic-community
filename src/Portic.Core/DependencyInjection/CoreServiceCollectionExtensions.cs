@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Portic.Core.Configuration;
+using Portic.Core.Costing;
 using Portic.Core.Entitlements;
 using Portic.Core.Governance;
 using Portic.Core.Observability;
@@ -30,6 +31,7 @@ public static class CoreServiceCollectionExtensions
 
         services.AddSingleton<IProviderRouter, ProviderRouter>();
         services.AddSingleton<IAuditSink, LoggingAuditSink>();
+        services.AddSingleton<IUsageCostEstimator, UnknownUsageCostEstimator>();
         services.AddSingleton<IMessageGateway, MessageGateway>();
 
         // Entitlement seam (engineering#3): Community ships the fail-static, empty-grant-set
