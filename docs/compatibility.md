@@ -77,7 +77,7 @@ change (mirrors the audit/telemetry placeholder pattern in ADR-0002).
   features). No dependency on OS-specific APIs. Bumped from .NET 9 to consume the published
   `Vev.Fabric.Contracts` package, which targets `net10.0` only.
 - Dependencies: `Microsoft.Extensions.*` and ASP.NET 10.x (MIT). No AGPL-incompatible dependency is
-  present (see ADR-0003 for the open `LICENSE`-file question).
+  present. ADR-0005 records the accepted runtime/SPI/enterprise license policy.
 
 ## Stability level
 
