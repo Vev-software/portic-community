@@ -24,7 +24,7 @@ Content-Type: application/json
 | `maxTokens` | `int?` | No | Soft cap on generated tokens. Adapters honor best-effort. |
 | `provider` | `string?` | No | Explicit provider name. Defaults to configured default when omitted. |
 
-Source: [`ChatRequest.cs`](../../src/Portic.Core/Contracts/ChatRequest.cs) · [`ChatMessage.cs`](../../src/Portic.Core/Contracts/ChatMessage.cs)
+Source: [`Portic.Sdk` NuGet package](https://www.nuget.org/packages/Portic.Sdk) · [`ChatRequest.cs`](https://github.com/Vev-software/portic-sdk/blob/main/contracts/dotnet/Portic.Sdk/Contracts/ChatRequest.cs) · [`ChatMessage.cs`](https://github.com/Vev-software/portic-sdk/blob/main/contracts/dotnet/Portic.Sdk/Contracts/ChatMessage.cs)
 
 ### Response — `ChatCompletion`
 
@@ -36,7 +36,7 @@ Source: [`ChatRequest.cs`](../../src/Portic.Core/Contracts/ChatRequest.cs) · [`
 | `message` | `ChatMessage` | The assistant message (`{ role, content }`) |
 | `usage` | `TokenUsage` | Token accounting: `{ inputTokens: int, outputTokens: int }` |
 
-Source: [`ChatCompletion.cs`](../../src/Portic.Core/Contracts/ChatCompletion.cs) · [`TokenUsage.cs`](../../src/Portic.Core/Contracts/TokenUsage.cs)
+Source: [`Portic.Sdk` NuGet package](https://www.nuget.org/packages/Portic.Sdk) · [`ChatCompletion.cs`](https://github.com/Vev-software/portic-sdk/blob/main/contracts/dotnet/Portic.Sdk/Contracts/ChatCompletion.cs) · [`TokenUsage.cs`](https://github.com/Vev-software/portic-sdk/blob/main/contracts/dotnet/Portic.Sdk/Contracts/TokenUsage.cs)
 
 ## Authentication Model
 
@@ -89,7 +89,7 @@ Expected response:
 
 ## Source References
 
-- `ChatRequest` — [`src/Portic.Core/Contracts/ChatRequest.cs`](../../src/Portic.Core/Contracts/ChatRequest.cs)
-- `ChatCompletion` — [`src/Portic.Core/Contracts/ChatCompletion.cs`](../../src/Portic.Core/Contracts/ChatCompletion.cs)
-- `ChatMessage` — [`src/Portic.Core/Contracts/ChatMessage.cs`](../../src/Portic.Core/Contracts/ChatMessage.cs)
-- `TokenUsage` — [`src/Portic.Core/Contracts/TokenUsage.cs`](../../src/Portic.Core/Contracts/TokenUsage.cs)
+- `ChatRequest` — [`Portic.Sdk` contract source](https://github.com/Vev-software/portic-sdk/blob/main/contracts/dotnet/Portic.Sdk/Contracts/ChatRequest.cs)
+- `ChatCompletion` — [`Portic.Sdk` contract source](https://github.com/Vev-software/portic-sdk/blob/main/contracts/dotnet/Portic.Sdk/Contracts/ChatCompletion.cs)
+- `ChatMessage` — [`Portic.Sdk` contract source](https://github.com/Vev-software/portic-sdk/blob/main/contracts/dotnet/Portic.Sdk/Contracts/ChatMessage.cs)
+- `TokenUsage` — [`Portic.Sdk` contract source](https://github.com/Vev-software/portic-sdk/blob/main/contracts/dotnet/Portic.Sdk/Contracts/TokenUsage.cs)

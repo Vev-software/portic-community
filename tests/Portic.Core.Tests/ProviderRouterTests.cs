@@ -1,8 +1,9 @@
 using Microsoft.Extensions.Options;
 using Portic.Core.Configuration;
-using Portic.Core.Contracts;
 using Portic.Core.Providers;
 using Portic.Core.Routing;
+using Portic.Sdk.Contracts;
+using Portic.Sdk.Providers;
 using Xunit;
 
 namespace Portic.Core.Tests;

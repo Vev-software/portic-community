@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Portic.Core.Providers;
+using Portic.Sdk.Providers;
 
 namespace Portic.Providers.Stub;
 

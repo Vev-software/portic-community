@@ -1,4 +1,4 @@
-using Portic.Core.Contracts;
+using Portic.Sdk.Contracts;
 
 namespace Portic.Core;
 

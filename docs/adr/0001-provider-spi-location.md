@@ -1,6 +1,6 @@
 # ADR-0001: Provider SPI location — `portic-sdk` (Apache-2.0)
 
-- Status: **Proposed**
+- Status: **Accepted / implemented**
 - Date: 2026-08-02
 
 ## Context
@@ -15,25 +15,22 @@ where it should live:
   If the SPI ships only from the AGPL runtime, every external adapter inherits AGPL — which defeats
   the "providers are disposable, the abstraction is permanent, integrators are welcome" intent.
 
-## Decision (proposed)
+## Decision
 
 The SPI and the normalized wire contracts should live in the Apache-2.0 **`portic-sdk`** package, and
 this runtime should depend on that package rather than defining the interface locally.
 
-Until `portic-sdk` exists / is wired up, the SPI is **stubbed locally** in `Portic.Core` (namespaces
-`Portic.Core.Providers` and `Portic.Core.Contracts`) with a `TODO(ADR-0001)` on `IChatProvider`. This
-is deliberately the smallest surface — one interface plus four records — so the later move is a
-namespace change, not a redesign.
+This decision is now implemented: the runtime consumes `Portic.Sdk` from nuget.org, and the local
+stubbed copies in `Portic.Core` have been removed. The move stayed deliberately small — one
+interface plus four records — so it remained a namespace/assembly extraction, not a redesign.
 
 ## Consequences
 
-- **Now:** no external dependency; contributors can build immediately. The boundary is still enforced
-  by the fitness test regardless of where the SPI type is declared.
-- **When adopted:** move `IChatProvider`, `ChatRequest`, `ChatCompletion`, `ChatMessage`, `TokenUsage`
-  into `portic-sdk`; replace the local types with a package reference; keep the runtime AGPL and the
-  contract Apache-2.0. Adapter authors reference only the Apache-2.0 package.
+- **Now:** `IChatProvider`, `ChatRequest`, `ChatCompletion`, `ChatMessage`, and `TokenUsage` come from
+  `Portic.Sdk`; the runtime depends on the public Apache-2.0 package while remaining AGPL-3.0.
+  Adapter authors reference only the Apache-2.0 package.
 
-## Open question
+## Result
 
-Does `portic-sdk` already define equivalents we must conform to? If so, this runtime conforms to
-those names rather than the placeholders here. Do not fork a second contract.
+`portic-sdk` now owns the public SPI and normalized contracts. `portic-community` consumes those
+published types directly and no longer carries a parallel local copy.

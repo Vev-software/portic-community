@@ -1,7 +1,8 @@
 using Microsoft.Extensions.Options;
 using Portic.Core.Configuration;
-using Portic.Core.Contracts;
 using Portic.Core.Providers;
+using Portic.Sdk.Contracts;
+using Portic.Sdk.Providers;
 
 namespace Portic.Core.Routing;
 
