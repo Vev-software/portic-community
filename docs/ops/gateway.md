@@ -38,6 +38,7 @@ To build locally: `docker build -t portic-gateway . && docker run --rm -p 8080:8
 | Setting | Env var | Default | Notes |
 | --- | --- | --- | --- |
 | Default provider | `Portic__DefaultProvider` | `stub` | Provider used when a request omits `provider`. |
+| Recent-call store capacity | n/a | `256` rows | In-process ring buffer for `GET /v1/audit/recent-calls`; oldest rows are evicted first. |
 | Bind URL | `ASPNETCORE_URLS` | `http://localhost:5187` (dev) | Standard ASP.NET binding. |
 | Log level | `Logging__LogLevel__Default` | `Information` | Standard `Microsoft.Extensions.Logging`. |
 
@@ -50,7 +51,27 @@ that is logged.
 - `POST /v1/messages` — normalized request → normalized completion. `400` with a reason-coded
   `ProblemDetails` for empty `messages` (`messages_required`) or an unknown `provider`
   (`provider_not_found`).
+- `GET /v1/audit/recent-calls` — lists recent traffic that went through Portic itself, backed by the
+  bounded in-process read model. Optional query filters: `provider`, `model`, `outcome`, `since`,
+  `until`.
 - `GET /health` — liveness/readiness probe, returns `{"status":"ok"}`. Wire this to your orchestrator.
+
+### Recent-call inspection
+
+Use the recent-call endpoint to inspect traffic that already flowed through the gateway, without raw log
+access:
+
+```bash
+curl "http://localhost:5187/v1/audit/recent-calls?provider=stub&outcome=success"
+```
+
+Response rows include timestamp, route, provider, model, outcome, latency, token counts, content-state
+flags, and cost-estimate metadata. Community limitations are explicit:
+
+- retention is in-process and non-durable
+- capacity is bounded and oldest rows are evicted first
+- tenant/principal identity is still the Community placeholder unless the host composes a different request context
+- the endpoint only reflects traffic through Portic; it does not discover usage outside the gateway
 
 ## Observability
 
