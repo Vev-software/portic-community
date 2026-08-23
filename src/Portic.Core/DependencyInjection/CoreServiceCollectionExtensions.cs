@@ -5,6 +5,7 @@ using Portic.Core.Costing;
 using Portic.Core.Entitlements;
 using Portic.Core.Governance;
 using Portic.Core.Observability;
+using Portic.Core.RecentCalls;
 using Portic.Core.Routing;
 using Vev.Fabric.Contracts.Entitlements;
 
@@ -30,7 +31,15 @@ public static class CoreServiceCollectionExtensions
             .ValidateOnStart();
 
         services.AddSingleton<IProviderRouter, ProviderRouter>();
-        services.AddSingleton<IAuditSink, LoggingAuditSink>();
+        services.AddSingleton<IRecentCallStore>(_ => new BoundedRecentCallStore());
+        services.AddSingleton<IRecentCallQueryService, RecentCallQueryService>();
+        services.AddSingleton<LoggingAuditSink>();
+        services.AddSingleton<RecentCallAuditSink>();
+        services.AddSingleton<IAuditSink>(serviceProvider => new CompositeAuditSink(
+            [
+                serviceProvider.GetRequiredService<LoggingAuditSink>(),
+                serviceProvider.GetRequiredService<RecentCallAuditSink>(),
+            ]));
         services.AddSingleton<IUsageCostEstimator, UnknownUsageCostEstimator>();
         services.AddSingleton<IMessageGateway, MessageGateway>();
 
