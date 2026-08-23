@@ -61,6 +61,10 @@ that is logged.
   route/provider/model/outcome/reason/token counts, latency, tenant/principal ids, placeholder-vs-external
   identity state, explicit request/response content-state flags, and cost-estimate metadata
   (`Estimated`, `UnknownPricing`, or `NotComputed`) — **no message content**.
+- **Recent-call read view:** Community also projects those same audit events into a bounded, in-process
+  recent-call store for internal querying by provider, model, outcome, and time window. This is
+  intentionally non-durable and eviction-based, suitable for a Community read view but not a control-plane
+  database.
 - **Cost semantics:** any monetary figure in Community audit metadata is an **estimate**, not invoice
   truth. Estimates must later be reconciled against provider invoices; unknown pricing is emitted
   explicitly instead of as an implied zero.
