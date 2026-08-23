@@ -51,6 +51,21 @@ content (the audit event is content-free by design). It exists ahead of the plan
 
 ## Entitlement seam
 
+`Portic.Core.Entitlements` gates every paid capability through the Fabric entitlement contract
+(`Vev.Fabric.Contracts`), never a hand-rolled plan check (fitness-tested). Community's evaluator
+(`CommunityEntitlementService`) has an empty grant set and denies every reserved paid capability
+(`PorticCapabilities.ReservedPaid`) unconditionally — there is no configuration, snapshot or remote
+source that could change that. The free gateway core does not call the gate at all today, so this
+has no effect on `POST /v1/messages` or any other current endpoint; it exists so a future paid
+capability composes through entitlement from day one instead of migrating onto it later.
+
+Tenant/principal identity is currently a fixed single-tenant placeholder
+(`SingleTenantRequestContextAccessor`) — there is no authentication. Real Fabric identity is a
+separate, later contract to consume; swapping it in is a DI registration change, not a call-site
+change (mirrors the audit/telemetry placeholder pattern in ADR-0002).
+
+## Platform
+
 - Runtime: .NET 10 (`net10.0`), SDK pinned via `global.json` (`10.0.100`, roll-forward to newer 10.0.x
   features). No dependency on OS-specific APIs. Bumped from .NET 9 to consume the published
   `Vev.Fabric.Contracts` package, which targets `net10.0` only.
