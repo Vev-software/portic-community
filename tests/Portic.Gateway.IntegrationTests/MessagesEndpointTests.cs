@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
-using Portic.Core.Contracts;
+using Portic.Sdk.Contracts;
 using Xunit;
 
 namespace Portic.Gateway.IntegrationTests;

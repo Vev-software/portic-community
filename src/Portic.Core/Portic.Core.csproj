@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    Portic.Core is the gateway domain: normalized AI contracts, the provider SPI (port), routing, and
-    the observability ports (audit + telemetry). It has NO dependency on any AI-provider SDK and no
-    dependency on ASP.NET. Concrete providers live in Portic.Providers.* adapters.
+    Portic.Core is the gateway domain: routing, orchestration, governance, and the observability
+    ports (audit + telemetry). The normalized contracts/provider SPI come from Portic.Sdk; this
+    assembly still has NO dependency on any concrete AI-provider SDK and no dependency on ASP.NET.
+    Concrete providers live in Portic.Providers.* adapters.
   -->
   <PropertyGroup>
     <RootNamespace>Portic.Core</RootNamespace>
@@ -15,6 +16,7 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Portic.Sdk" Version="0.1.0" />
 
     <!-- Entitlement contract (fabric#4): tenant/principal context, CapabilityId, EntitlementDecision,
          IEntitlementService. Requires net10.0 (Vev.Fabric.Contracts has no earlier-TFM build). -->

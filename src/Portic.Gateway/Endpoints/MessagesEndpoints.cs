@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Portic.Core;
-using Portic.Core.Contracts;
 using Portic.Core.Governance;
 using Portic.Core.Providers;
+using Portic.Sdk.Contracts;
 
 namespace Portic.Gateway.Endpoints;
 

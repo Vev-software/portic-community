@@ -21,25 +21,10 @@ Clients should ignore unknown fields to remain forward-compatible.
 ## Provider SPI
 
 `IChatProvider` + the normalized contracts are the adapter contract. New providers implement it without
-any change to the core (see the fitness test). The SPI is expected to move to the Apache-2.0
-`portic-sdk` package (ADR-0001); when it does, the **type shapes are preserved** — only the declaring
-assembly/namespace changes. Adapters compiled against the placeholder should expect a one-time
-namespace migration.
-
-## Entitlement seam
-
-`Portic.Core.Entitlements` gates every paid capability through the Fabric entitlement contract
-(`Vev.Fabric.Contracts`), never a hand-rolled plan check (fitness-tested). Community's evaluator
-(`CommunityEntitlementService`) has an empty grant set and denies every reserved paid capability
-(`PorticCapabilities.ReservedPaid`) unconditionally — there is no configuration, snapshot or remote
-source that could change that. The free gateway core does not call the gate at all today, so this
-has no effect on `POST /v1/messages` or any other current endpoint; it exists so a future paid
-capability composes through entitlement from day one instead of migrating onto it later.
-
-Tenant/principal identity is currently a fixed single-tenant placeholder
-(`SingleTenantRequestContextAccessor`) — there is no authentication. Real Fabric identity is a
-separate, later contract to consume; swapping it in is a DI registration change, not a call-site
-change (mirrors the audit/telemetry placeholder pattern in ADR-0002).
+any change to the core (see the fitness test). The SPI and normalized contracts now come from the
+Apache-2.0 `Portic.Sdk` package on nuget.org; the runtime no longer declares local duplicates in
+`Portic.Core`. The **type shapes are preserved** — the change was assembly/namespace location, not
+wire semantics or runtime behavior.
 
 ## Governance policy
 

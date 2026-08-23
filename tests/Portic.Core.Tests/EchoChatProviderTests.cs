@@ -1,5 +1,5 @@
-using Portic.Core.Contracts;
 using Portic.Providers.Stub;
+using Portic.Sdk.Contracts;
 using Xunit;
 
 namespace Portic.Core.Tests;

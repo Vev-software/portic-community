@@ -1,5 +1,5 @@
-using Portic.Core.Contracts;
-using Portic.Core.Providers;
+using Portic.Sdk.Contracts;
+using Portic.Sdk.Providers;
 
 namespace Portic.Providers.Stub;
 

@@ -1,10 +1,11 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
-using Portic.Core.Contracts;
 using Portic.Core.Governance;
 using Portic.Core.Observability;
 using Portic.Core.Providers;
 using Portic.Core.Routing;
+using Portic.Sdk.Contracts;
+using Portic.Sdk.Providers;
 
 namespace Portic.Core;
 
