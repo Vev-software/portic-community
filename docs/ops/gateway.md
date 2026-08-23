@@ -8,6 +8,10 @@ A stateless ASP.NET Core service. No database, no external calls in the default 
 Horizontally scalable: run N replicas behind any HTTP load balancer; there is no shared state and the
 request path never blocks on a control-plane store (AGENTS.md `04 §5`).
 
+That boundary is enforced by `tests/Portic.Architecture.Tests`: runtime projects must not reference
+database/control-plane client packages or direct DB APIs. Community quota and recent-call state are
+bounded in-process views, not shared control-plane storage.
+
 ## Run
 
 ```bash

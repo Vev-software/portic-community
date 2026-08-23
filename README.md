@@ -95,6 +95,10 @@ if any non-adapter project or assembly references an AI-provider SDK. Adding a n
 adding a `Portic.Providers.<name>` adapter that implements `IChatProvider`; nothing in the core
 changes. See [`AGENTS.md`](./AGENTS.md) and [`docs/`](./docs) (ADRs, ops, threat model, compatibility).
 
+The data-plane boundary is machine-enforced too: runtime projects must not reference
+database/control-plane client packages or call direct DB APIs. Durable control-plane state belongs
+outside this Community runtime; local quota and recent-call state are bounded, in-process views.
+
 ## Configuration
 
 - `Portic:DefaultProvider` (env `Portic__DefaultProvider`) — provider used when a request names none. Default `stub`.
