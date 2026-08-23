@@ -5,6 +5,9 @@
 - `POST /v1/messages` — request/response are the normalized `ChatRequest` / `ChatCompletion` contracts.
   The `/v1` prefix is the stability boundary: within `v1`, changes are **additive** (new optional
   fields, new providers). Breaking changes ship under a new version prefix (`/v2`).
+- `GET /v1/audit/recent-calls` — lists recent traffic that passed through Portic, with optional filters
+  `provider`, `model`, `outcome`, `since`, and `until`. The shape is additive within `v1`; retention is
+  in-process and non-durable by design in Community.
 - `GET /health` — stable, unversioned; shape `{"status":"ok"}`.
 
 ### `v1` request/response (current)
@@ -13,6 +16,10 @@
   `maxTokens` (int, optional), `provider` (string, optional).
 - Response: `id`, `model`, `provider`, `message {role, content}`, `usage {inputTokens, outputTokens,
   totalTokens}`.
+- Recent-call row: `timestamp`, `eventType`, `route`, `provider`, `model`, `outcome`, `latencyMs`,
+  `tenantId`, `principalId`, `identityState`, `requestContentState`, `responseContentState`,
+  `inputTokens`, `outputTokens`, `costEstimationStatus`, `estimatedCost`, `estimatedCostCurrency`,
+  `costEstimationSource`, `reasonCode`.
 - Errors: `ProblemDetails` with a `title` reason code: `400` (`messages_required`, `provider_not_found`),
   `403` (`model_not_allowed`), `429` (`quota_exceeded`).
 

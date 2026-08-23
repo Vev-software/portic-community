@@ -12,6 +12,7 @@ builder.Services.AddStubProvider();
 var app = builder.Build();
 
 app.MapMessagesEndpoints();
+app.MapRecentCallsEndpoints();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" })).WithName("Health");
 
 app.Run();
