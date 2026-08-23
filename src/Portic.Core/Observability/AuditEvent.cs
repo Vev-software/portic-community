@@ -1,5 +1,18 @@
 namespace Portic.Core.Observability;
 
+public enum AuditIdentityState
+{
+    Placeholder,
+    External,
+}
+
+public enum AuditContentState
+{
+    Withheld,
+    Sanitized,
+    Stored,
+}
+
 /// <summary>
 /// A structured, content-free record of one gateway operation, suitable for an audit trail.
 ///
@@ -13,12 +26,31 @@ public sealed record AuditEvent
 
     public required DateTimeOffset Timestamp { get; init; }
 
+    /// <summary>Logical gateway route, currently the HTTP slice name (e.g. "POST /v1/messages").</summary>
+    public required string Route { get; init; }
+
     public required string Provider { get; init; }
 
     public required string Model { get; init; }
 
     /// <summary>"success" or "error".</summary>
     public required string Outcome { get; init; }
+
+    /// <summary>Wall-clock duration of the gateway operation in whole milliseconds.</summary>
+    public required long LatencyMs { get; init; }
+
+    /// <summary>Community today emits placeholder identity; richer Fabric-backed identity can replace it later.</summary>
+    public required AuditIdentityState IdentityState { get; init; }
+
+    public required string TenantId { get; init; }
+
+    public required string PrincipalId { get; init; }
+
+    /// <summary>Whether request content was withheld, sanitized, or stored in audit metadata.</summary>
+    public required AuditContentState RequestContentState { get; init; }
+
+    /// <summary>Whether response content was withheld, sanitized, or stored in audit metadata.</summary>
+    public required AuditContentState ResponseContentState { get; init; }
 
     public int? InputTokens { get; init; }
 

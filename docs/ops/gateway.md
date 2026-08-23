@@ -58,9 +58,13 @@ that is logged.
   `portic.provider`, `portic.model`, `portic.tokens.input/output`). Subscribe with an OpenTelemetry
   listener/exporter in your host. See ADR-0002.
 - **Audit:** structured `audit ai.message.completed|failed` log records (EventId 1000) with
-  provider/model/outcome/reason/token counts — **no message content**.
+  route/provider/model/outcome/reason/token counts, latency, tenant/principal ids, placeholder-vs-external
+  identity state, and explicit request/response content-state flags — **no message content**.
 - **What is never emitted:** prompt or completion text, and any secret. Verified by design
   (`AuditEvent` has no content field) and by the threat model.
+- **Community identity boundary:** Community currently emits the fixed single-tenant placeholder
+  identity (`portic-community-default` / `anonymous`) unless a different `IRequestContextAccessor`
+  is composed in by the host. Richer real-user identity remains a later Fabric integration concern.
 
 ## Failure modes
 

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Portic.Core.Entitlements;
 using Portic.Core.Governance;
 using Portic.Core.Observability;
 using Portic.Core.Providers;
@@ -17,14 +18,19 @@ namespace Portic.Core;
 public sealed partial class MessageGateway(
     GovernancePolicyGate policy,
     IProviderRouter router,
+    IRequestContextAccessor context,
     IAuditSink auditSink,
     ILogger<MessageGateway> logger) : IMessageGateway
 {
+    private const string MessageRoute = "POST /v1/messages";
+
     public async Task<ChatCompletion> SendAsync(ChatRequest request, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         using var activity = PorticTelemetry.ActivitySource.StartActivity("ai.message");
+        var startedAt = DateTimeOffset.UtcNow;
+        var stopwatch = Stopwatch.StartNew();
 
         try
         {
@@ -34,7 +40,7 @@ public sealed partial class MessageGateway(
         {
             activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             await auditSink.RecordAsync(
-                Failure(request.Model, provider: "n/a", ex.ReasonCode),
+                Failure(request.Model, provider: "n/a", ex.ReasonCode, startedAt, stopwatch.ElapsedMilliseconds),
                 cancellationToken).ConfigureAwait(false);
             throw;
         }
@@ -48,7 +54,7 @@ public sealed partial class MessageGateway(
         {
             activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             await auditSink.RecordAsync(
-                Failure(request.Model, ex.ProviderName, "provider_not_found"),
+                Failure(request.Model, ex.ProviderName, "provider_not_found", startedAt, stopwatch.ElapsedMilliseconds),
                 cancellationToken).ConfigureAwait(false);
             throw;
         }
@@ -67,10 +73,17 @@ public sealed partial class MessageGateway(
             await auditSink.RecordAsync(new AuditEvent
             {
                 EventType = "ai.message.completed",
-                Timestamp = DateTimeOffset.UtcNow,
+                Timestamp = startedAt,
+                Route = MessageRoute,
                 Provider = provider.Name,
                 Model = completion.Model,
                 Outcome = "success",
+                LatencyMs = stopwatch.ElapsedMilliseconds,
+                IdentityState = ResolveIdentityState(),
+                TenantId = context.Tenant.TenantId,
+                PrincipalId = context.Principal.PrincipalId,
+                RequestContentState = AuditContentState.Withheld,
+                ResponseContentState = AuditContentState.Withheld,
                 InputTokens = completion.Usage.InputTokens,
                 OutputTokens = completion.Usage.OutputTokens,
             }, cancellationToken).ConfigureAwait(false);
@@ -82,21 +95,31 @@ public sealed partial class MessageGateway(
         {
             activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             await auditSink.RecordAsync(
-                Failure(request.Model, provider.Name, "provider_error"),
+                Failure(request.Model, provider.Name, "provider_error", startedAt, stopwatch.ElapsedMilliseconds),
                 cancellationToken).ConfigureAwait(false);
             throw;
         }
     }
 
-    private static AuditEvent Failure(string model, string provider, string reasonCode) => new()
+    private AuditEvent Failure(string model, string provider, string reasonCode, DateTimeOffset startedAt, long latencyMs) => new()
     {
         EventType = "ai.message.failed",
-        Timestamp = DateTimeOffset.UtcNow,
+        Timestamp = startedAt,
+        Route = MessageRoute,
         Provider = provider,
         Model = model,
         Outcome = "error",
+        LatencyMs = latencyMs,
+        IdentityState = ResolveIdentityState(),
+        TenantId = context.Tenant.TenantId,
+        PrincipalId = context.Principal.PrincipalId,
+        RequestContentState = AuditContentState.Withheld,
+        ResponseContentState = AuditContentState.Withheld,
         ReasonCode = reasonCode,
     };
+
+    private AuditIdentityState ResolveIdentityState() =>
+        context is SingleTenantRequestContextAccessor ? AuditIdentityState.Placeholder : AuditIdentityState.External;
 
     [LoggerMessage(
         EventId = 2000,

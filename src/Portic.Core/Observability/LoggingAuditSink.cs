@@ -14,9 +14,16 @@ public sealed partial class LoggingAuditSink(ILogger<LoggingAuditSink> logger) :
         Audit(
             logger,
             auditEvent.EventType,
+            auditEvent.Route,
             auditEvent.Provider,
             auditEvent.Model,
             auditEvent.Outcome,
+            auditEvent.LatencyMs,
+            auditEvent.IdentityState,
+            auditEvent.TenantId,
+            auditEvent.PrincipalId,
+            auditEvent.RequestContentState,
+            auditEvent.ResponseContentState,
             auditEvent.ReasonCode,
             auditEvent.InputTokens,
             auditEvent.OutputTokens);
@@ -27,13 +34,20 @@ public sealed partial class LoggingAuditSink(ILogger<LoggingAuditSink> logger) :
     [LoggerMessage(
         EventId = 1000,
         Level = LogLevel.Information,
-        Message = "audit {EventType} provider={Provider} model={Model} outcome={Outcome} reason={ReasonCode} tokensIn={InputTokens} tokensOut={OutputTokens}")]
+        Message = "audit {EventType} route={Route} provider={Provider} model={Model} outcome={Outcome} latencyMs={LatencyMs} identityState={IdentityState} tenant={TenantId} principal={PrincipalId} requestContentState={RequestContentState} responseContentState={ResponseContentState} reason={ReasonCode} tokensIn={InputTokens} tokensOut={OutputTokens}")]
     private static partial void Audit(
         ILogger logger,
         string eventType,
+        string route,
         string provider,
         string model,
         string outcome,
+        long latencyMs,
+        AuditIdentityState identityState,
+        string tenantId,
+        string principalId,
+        AuditContentState requestContentState,
+        AuditContentState responseContentState,
         string? reasonCode,
         int? inputTokens,
         int? outputTokens);
