@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Portic.Core.Costing;
 using Portic.Core.Entitlements;
 using Portic.Core.Governance;
 using Portic.Core.Observability;
@@ -18,6 +19,7 @@ namespace Portic.Core;
 public sealed partial class MessageGateway(
     GovernancePolicyGate policy,
     IProviderRouter router,
+    IUsageCostEstimator costEstimator,
     IRequestContextAccessor context,
     IAuditSink auditSink,
     ILogger<MessageGateway> logger) : IMessageGateway
@@ -66,6 +68,7 @@ public sealed partial class MessageGateway(
         try
         {
             var completion = await provider.CompleteAsync(request, cancellationToken).ConfigureAwait(false);
+            var costEstimate = EstimateCost(provider.Name, completion);
 
             activity?.SetTag("portic.tokens.input", completion.Usage.InputTokens);
             activity?.SetTag("portic.tokens.output", completion.Usage.OutputTokens);
@@ -86,6 +89,10 @@ public sealed partial class MessageGateway(
                 ResponseContentState = AuditContentState.Withheld,
                 InputTokens = completion.Usage.InputTokens,
                 OutputTokens = completion.Usage.OutputTokens,
+                CostEstimationStatus = costEstimate.Status,
+                EstimatedCost = costEstimate.Amount,
+                EstimatedCostCurrency = costEstimate.Currency,
+                CostEstimationSource = costEstimate.Source,
             }, cancellationToken).ConfigureAwait(false);
 
             Completed(logger, provider.Name, completion.Model, completion.Usage.InputTokens, completion.Usage.OutputTokens);
@@ -115,11 +122,24 @@ public sealed partial class MessageGateway(
         PrincipalId = context.Principal.PrincipalId,
         RequestContentState = AuditContentState.Withheld,
         ResponseContentState = AuditContentState.Withheld,
+        CostEstimationStatus = AuditCostEstimationStatus.NotComputed,
+        EstimatedCost = null,
+        EstimatedCostCurrency = null,
+        CostEstimationSource = "not-computed",
         ReasonCode = reasonCode,
     };
 
     private AuditIdentityState ResolveIdentityState() =>
         context is SingleTenantRequestContextAccessor ? AuditIdentityState.Placeholder : AuditIdentityState.External;
+
+    private UsageCostEstimate EstimateCost(string provider, ChatCompletion completion) =>
+        costEstimator.Estimate(new UsageCostEstimationInput
+        {
+            Provider = provider,
+            Model = completion.Model,
+            InputTokens = completion.Usage.InputTokens,
+            OutputTokens = completion.Usage.OutputTokens,
+        });
 
     [LoggerMessage(
         EventId = 2000,
