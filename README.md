@@ -84,6 +84,10 @@ dotnet test tests/Portic.Architecture.Tests   # fitness/architecture guardrails 
 
 - [Atlas Community](./docs/integrations/atlas-community.md) — gateway contract, authentication model, and example requests
 
+## Product docs
+
+- [Portic as the sanctioned alternative to shadow AI](./docs/shadow-ai.md) — product framing, scope boundary, and sovereignty posture
+
 ## Guardrails
 
 The headline guardrail — *AI-native, never vendor-bound* — is machine-enforced: a fitness test fails
