@@ -107,8 +107,9 @@ outside this Community runtime; local quota and recent-call state are bounded, i
 
 ## Licensing
 
-Runtime: **AGPL-3.0** (see [`LICENSE`](./LICENSE)). Client SDKs / provider SPI / contracts are intended
-for **Apache-2.0** `portic-sdk` (see
-[`docs/adr/0001-provider-spi-location.md`](./docs/adr/0001-provider-spi-location.md)).
+Runtime: **AGPL-3.0** (see [`LICENSE`](./LICENSE)). Client SDKs / provider SPI / contracts are
+**Apache-2.0** in `portic-sdk` (see
+[`docs/adr/0001-provider-spi-location.md`](./docs/adr/0001-provider-spi-location.md) and
+[`docs/adr/0005-license-policy.md`](./docs/adr/0005-license-policy.md)).
 [ADR-0003](./docs/adr/0003-license-file-discrepancy.md) records the resolution of an earlier
 Apache-2.0/AGPL-3.0 mismatch in the `LICENSE` file.

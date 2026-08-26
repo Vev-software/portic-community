@@ -1,4 +1,4 @@
-# ADR-0003: `LICENSE` file is Apache-2.0 but the runtime must be AGPL-3.0
+# ADR-0003: `LICENSE` file was Apache-2.0 but the runtime must be AGPL-3.0
 
 - Status: **Accepted — resolved via Option 1** (maintainer decision, 2026-08-03)
 - Date: 2026-08-02
@@ -7,7 +7,7 @@
 > `LICENSE` was replaced with the verbatim GNU AGPL-3.0 text (from `https://www.gnu.org/licenses/agpl-3.0.txt`),
 > matching AGENTS.md "Licensing". Current dependencies (Microsoft.Extensions.* / ASP.NET 9.x, all MIT)
 > are AGPL-compatible. The "Do NOT touch `LICENSE`" guardrail was overridden by explicit maintainer
-> instruction for this one change.
+> instruction for this one change. ADR-0005 records the broader runtime/SPI/enterprise license policy.
 
 ## Context
 
