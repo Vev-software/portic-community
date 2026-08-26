@@ -99,6 +99,9 @@ The data-plane boundary is machine-enforced too: runtime projects must not refer
 database/control-plane client packages or call direct DB APIs. Durable control-plane state belongs
 outside this Community runtime; local quota and recent-call state are bounded, in-process views.
 
+The product scope boundary is also fitness-tested: agent runtime, RAG, document processing, and MCP
+registry work must stay on separate integration tracks rather than growing inside the Community core.
+
 ## Configuration
 
 - `Portic:DefaultProvider` (env `Portic__DefaultProvider`) — provider used when a request names none. Default `stub`.
