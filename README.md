@@ -110,9 +110,17 @@ registry work must stay on separate integration tracks rather than growing insid
 
 ## Licensing
 
-Runtime: **AGPL-3.0** (see [`LICENSE`](./LICENSE)). Client SDKs / provider SPI / contracts are
-**Apache-2.0** in `portic-sdk` (see
+This runtime is **dual-licensed: AGPL-3.0 or a commercial license from VEV** — use it under
+either. See **[`LICENSING.md`](./LICENSING.md)** for which one you need and
+[ADR-0006](./docs/adr/0006-dual-licensing-the-runtime.md) for the decision. The AGPL-3.0
+terms are in [`LICENSE`](./LICENSE).
+
+The client SDK / provider SPI / contracts are **Apache-2.0** in `portic-sdk` — depend on
+those from proprietary code freely (see
 [`docs/adr/0001-provider-spi-location.md`](./docs/adr/0001-provider-spi-location.md) and
 [`docs/adr/0005-license-policy.md`](./docs/adr/0005-license-policy.md)).
-[ADR-0003](./docs/adr/0003-license-file-discrepancy.md) records the resolution of an earlier
-Apache-2.0/AGPL-3.0 mismatch in the `LICENSE` file.
+[ADR-0003](./docs/adr/0003-license-file-discrepancy.md) records the earlier Apache-2.0/
+AGPL-3.0 mismatch in the `LICENSE` file.
+
+Contributions require the [Contributor License Agreement](./CLA.md) so the dual-license
+model stays intact — see [`CONTRIBUTING.md`](./CONTRIBUTING.md).

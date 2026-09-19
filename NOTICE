@@ -1,0 +1,13 @@
+Portic Community Edition
+Copyright (c) VEV Software ApS and the Portic contributors.
+
+This product is dual-licensed under the GNU Affero General Public License, version 3.0
+(see LICENSE) or a commercial license from VEV Software ApS (see LICENSING.md).
+
+The client SDK, provider SPI and normalized contracts that this runtime implements are
+distributed separately under the Apache License 2.0 in the portic-sdk repository
+(https://github.com/Vev-software/portic-sdk).
+
+This software may include third-party components distributed under their own licenses.
+Those licenses are compatible with the AGPL-3.0 for the runtime; see each dependency's
+package metadata for its terms.
