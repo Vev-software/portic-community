@@ -1,0 +1,35 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Portic.Core;
+using Portic.Core.DependencyInjection;
+using Portic.Sdk.Contracts;
+using Portic.Sdk.Providers;
+
+var configuration = new ConfigurationBuilder().AddInMemoryCollection(
+    new Dictionary<string, string?> { ["Portic:DefaultProvider"] = "consumer" }).Build();
+var services = new ServiceCollection();
+services.AddLogging();
+services.AddPorticCore(configuration);
+services.AddSingleton<IChatProvider, ConsumerProvider>();
+using var provider = services.BuildServiceProvider();
+var completion = await provider.GetRequiredService<IMessageGateway>().SendAsync(new ChatRequest
+{
+    Model = "test-model",
+    Messages = [new ChatMessage { Role = "user", Content = "package smoke" }]
+});
+if (completion.Provider != "consumer" || completion.Message.Content != "consumer reply" ||
+    completion.Usage.InputTokens != 2 || completion.Usage.OutputTokens != 3)
+    throw new InvalidOperationException("Packaged gateway did not execute the external provider.");
+Console.WriteLine("Packaged gateway composed and executed successfully.");
+
+sealed class ConsumerProvider : IChatProvider
+{
+    public string Name => "consumer";
+    public Task<ChatCompletion> CompleteAsync(ChatRequest request, CancellationToken cancellationToken = default)
+        => Task.FromResult(new ChatCompletion
+        {
+            Id = "package-smoke", Model = request.Model, Provider = Name,
+            Message = new ChatMessage { Role = "assistant", Content = "consumer reply" },
+            Usage = new TokenUsage { InputTokens = 2, OutputTokens = 3 }
+        });
+}
