@@ -16,6 +16,32 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <Deterministic>true</Deterministic>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <!-- Nothing is packable by default; only the runtime library (Portic.Core) opts in below.
+         The host app, the stub adapter and the tests are not NuGet packages. -->
+    <IsPackable>false</IsPackable>
+
+    <!-- Package metadata shared by any packable project in this repo. The runtime is dual-licensed
+         AGPL-3.0 OR commercial (LICENSING.md / ADR-0006); the package's declared OPEN license
+         expression is AGPL-3.0-only per ADR-0005. The commercial option is granted out-of-band. -->
+    <Company>VEV Software ApS</Company>
+    <Product>Portic</Product>
+    <Authors>VEV Software ApS</Authors>
+    <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Vev-software/portic-community</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Vev-software/portic-community</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+    <!-- Version is derived from the git tag by MinVer: tag `vX.Y.Z` produces package version
+         X.Y.Z; commits after a tag produce a pre-release. No hand-maintained version number
+         (matches portic-sdk / atlas-contracts / fabric). -->
+    <MinVerTagPrefix>v</MinVerTagPrefix>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Build-time only: sets Version/PackageVersion from the git tag. This repo does not use
+         Central Package Management, so the version is pinned here. -->
+    <PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
+  </ItemGroup>
 
 </Project>

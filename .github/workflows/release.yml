@@ -1,0 +1,59 @@
+# Auto-fires when the `release` workflow (publish.yml) pushes a vX.Y.Z tag. Creates the signed
+# GitHub Release and build-provenance attestations. Registry publishing lives in publish.yml.
+name: github release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    if: ${{ !github.event.repository.fork }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Prepare artifacts dir
+        run: mkdir -p artifacts
+
+      - name: Setup .NET (pinned by global.json)
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Build + test (public feeds only)
+        run: |
+          dotnet restore Portic.sln
+          dotnet build Portic.sln -c Release --no-restore
+          dotnet test Portic.sln -c Release --no-build
+
+      - name: Pack Portic.Core
+        run: dotnet pack src/Portic.Core/Portic.Core.csproj -c Release -o artifacts
+
+      - name: Generate SPDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: artifacts/${{ github.event.repository.name }}-${{ github.ref_name }}.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: "artifacts/*"
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" artifacts/* --verify-tag --generate-notes
