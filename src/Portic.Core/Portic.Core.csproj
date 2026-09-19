@@ -5,22 +5,27 @@
     ports (audit + telemetry). The normalized contracts/provider SPI come from Portic.Sdk; this
     assembly still has NO dependency on any concrete AI-provider SDK and no dependency on ASP.NET.
     Concrete providers live in Portic.Providers.* adapters.
+
+    This is the one packable project in the repo: it is the community runtime a gateway host
+    composes (with a provider adapter) to build a working gateway. Dual-licensed AGPL-3.0 OR
+    commercial — see LICENSING.md and ADR-0006; the package's OPEN license expression is
+    AGPL-3.0-only (Directory.Build.props / ADR-0005).
   -->
   <PropertyGroup>
     <RootNamespace>Portic.Core</RootNamespace>
+
     <IsPackable>true</IsPackable>
     <PackageId>Portic.Core</PackageId>
-    <Description>Provider-neutral Portic gateway runtime: routing, governance, orchestration and content-free observability. Provider adapters implement the separate Portic.Sdk SPI.</Description>
-    <Authors>VEV Software ApS</Authors>
-    <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
+    <Description>Portic community runtime: the provider-neutral AI gateway domain — routing, orchestration, governance and observability ports (IMessageGateway). Compose it with a Portic.Sdk provider adapter to host a gateway. Dual-licensed AGPL-3.0 or commercial.</Description>
+    <PackageTags>portic;ai;gateway;llm;runtime;provider-neutral;vev</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/Vev-software/portic-community</RepositoryUrl>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MinVer" Version="8.0.0" PrivateAssets="all" />
-    <None Include="README.md" Pack="true" PackagePath="/" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />

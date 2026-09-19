@@ -1,24 +1,31 @@
 # Portic.Core
 
-The .NET 10 provider-neutral gateway runtime: routing, policy enforcement,
-message orchestration, and content-free audit/telemetry seams.
+The **community runtime** of [Portic](https://github.com/Vev-software/portic-community), VEV's
+provider-neutral AI gateway. `Portic.Core` is the gateway *domain*: routing, orchestration,
+governance and the observability ports (`IMessageGateway` and friends). It has **no dependency
+on any concrete AI-provider SDK and no dependency on ASP.NET** — you compose it with a
+`Portic.Sdk` provider adapter and a host to build a working gateway.
 
-Runtime package metadata is **AGPL-3.0-only**, consistent with the repository's
-license policy. See the [repository](https://github.com/Vev-software/portic-community)
-for the established dual-license terms. This does not change licensing.
+## What it is for
 
-Hosts register `services.AddPorticCore(configuration)` from
-`Portic.Core.DependencyInjection`, configure `Portic:DefaultProvider`, register
-logging, and register their own `IChatProvider` implementations. Resolve
-`Portic.Core.IMessageGateway` and call `SendAsync` using the normalized chat
-contracts from `Portic.Sdk`.
+Use `Portic.Core` when you are **building a gateway host** (self-hosted or managed) and want the
+same routing/orchestration the Portic community gateway uses, rather than re-implementing it.
+Register the runtime, add one or more `IChatProvider` adapters (from `Portic.Sdk`), and map your
+transport to `IMessageGateway`.
 
-The package includes no HTTP host, concrete provider, model credentials or
-production identity setup. The default request context is single-tenant and the
-default entitlement evaluator denies paid capabilities. A host must configure
-its own identity/governance posture; composition does not grant capabilities.
+If you only need to *call* a Portic gateway, use **`Portic.Client`** instead. If you are writing a
+provider adapter or integrating against the message contracts, use **`Portic.Sdk`**. Both are
+Apache-2.0.
 
-Client and adapter authors who only need wire contracts or the provider SPI
-should reference the separate, Apache-2.0 `Portic.Sdk` instead of this runtime.
-Versions derive from repository release tags. Packaging does not change the
-existing `/v1/messages` HTTP contract or add OpenAI wire compatibility.
+## Licensing
+
+`Portic.Core` is **dual-licensed: AGPL-3.0 or a commercial license from VEV Software ApS**. The
+package's declared open license is `AGPL-3.0-only`. Self-hosting under AGPL-3.0 is free; embedding
+it in proprietary or closed-source software, or offering it as a hosted service without meeting
+AGPL-3.0's source-offer obligations, requires a commercial license. See
+[`LICENSING.md`](https://github.com/Vev-software/portic-community/blob/main/LICENSING.md).
+
+## Links
+
+- Source & docs: https://github.com/Vev-software/portic-community
+- SDK / provider SPI (Apache-2.0): https://github.com/Vev-software/portic-sdk
