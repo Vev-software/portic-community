@@ -16,6 +16,9 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <Deterministic>true</Deterministic>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- Only the runtime package opts in; gateway/providers/tests are not packages. -->
+    <IsPackable>false</IsPackable>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
   </PropertyGroup>
 
 </Project>

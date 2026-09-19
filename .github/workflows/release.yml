@@ -1,0 +1,17 @@
+# Shared signed-release implementation; no repository-specific packaging platform.
+name: signed release
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+jobs:
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    uses: Vev-software/.github/.github/workflows/release-dotnet-npm.yml@main
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    with:
+      solution: Portic.sln
+      dotnet_project: src/Portic.Core/Portic.Core.csproj

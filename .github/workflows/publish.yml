@@ -1,0 +1,190 @@
+# One-button release for the Portic.Core runtime package.
+#
+# Flow (Actions -> release -> Run workflow -> choose bump -> Run):
+#   1. verify  (no gate)  — refuse unless on main; require the latest `ci` run for main's HEAD
+#                            to be green; compute the next version from the last tag + bump.
+#   2. release (environment: release, Required Reviewers) — pauses for your Approve click, then
+#      build+test again, push the tag `vX.Y.Z` (which fires release.yml -> GitHub Release), and
+#      publish the runtime package to nuget.org via OIDC Trusted Publishing.
+#
+# WHY THIS FILE STAYS NAMED publish.yml: NuGet Trusted Publishing pins
+# `workflow=publish.yml`. OIDC token exchange matches on the workflow_ref filename, so renaming
+# this file (or moving the publish steps into a differently-named workflow) breaks the policy.
+name: release
+
+concurrency:
+  group: portic-core-release
+  cancel-in-progress: false
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump from the latest tag"
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+      dry_run:
+        description: "Validate + build + pack, but do NOT tag or publish"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify main + compute version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      version: ${{ steps.plan.outputs.version }}
+      tag: ${{ steps.plan.outputs.tag }}
+      sha: ${{ steps.plan.outputs.sha }}
+    steps:
+      - name: Refuse unless dispatched from main
+        run: |
+          if [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "::error::Run this from the default branch (main); got ${{ github.ref }}."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Require the latest CI run for this commit to be green
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SHA="$(git rev-parse HEAD)"
+          echo "main HEAD = $SHA"
+          CONCLUSION="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow ci.yml --branch main \
+            --limit 40 --json headSha,status,conclusion \
+            --jq "[.[] | select(.headSha==\"$SHA\")][0] | \"\(.status):\(.conclusion)\"")"
+          echo "ci for $SHA -> ${CONCLUSION:-none}"
+          if [ "$CONCLUSION" != "completed:success" ]; then
+            echo "::error::CI has not completed successfully for main@$SHA (state: ${CONCLUSION:-none}). Wait for CI to go green, then re-run."
+            exit 1
+          fi
+
+      - name: Require publishing setup before creating a tag
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUGET_USER: ${{ vars.NUGET_USER }}
+        run: |
+          test -n "$NUGET_USER" || { echo '::error::Configure NUGET_USER and NuGet Trusted Publishing first.'; exit 1; }
+          COUNT=$(gh api "repos/$GITHUB_REPOSITORY/environments/release" --jq '[.protection_rules[] | select(.type == "required_reviewers") | .reviewers[]] | length')
+          test "$COUNT" -gt 0 || { echo '::error::The release environment needs required reviewers.'; exit 1; }
+
+      - name: Compute next version
+        id: plan
+        run: |
+          git fetch --tags --force --quiet
+          LATEST="$(git tag -l --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)"
+          LATEST="${LATEST:-v0.0.0}"; LATEST="${LATEST#v}"
+          IFS=. read -r MA MI PA <<< "$LATEST"
+          case "${{ inputs.bump }}" in
+            patch) PA=$((PA+1));;
+            minor) MI=$((MI+1)); PA=0;;
+            major) MA=$((MA+1)); MI=0; PA=0;;
+          esac
+          VERSION="$MA.$MI.$PA"; TAG="v$VERSION"
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "::error::Tag $TAG already exists."; exit 1
+          fi
+          echo "Next: $LATEST -> $VERSION (${{ inputs.bump }})"
+          {
+            echo "version=$VERSION"
+            echo "tag=$TAG"
+            echo "sha=$(git rev-parse HEAD)"
+          } >> "$GITHUB_OUTPUT"
+
+  release:
+    name: publish ${{ needs.verify.outputs.tag }} to nuget.org
+    needs: verify
+    if: ${{ !github.event.repository.fork }}
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+      id-token: write
+      actions: write # explicitly dispatch signed release: GITHUB_TOKEN tag pushes do not trigger it
+      attestations: read
+    env:
+      VERSION: ${{ needs.verify.outputs.version }}
+      TAG: ${{ needs.verify.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.verify.outputs.sha }}
+          fetch-depth: 0
+
+      - name: Setup .NET (pinned by global.json)
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Build + test (public feeds only)
+        run: |
+          dotnet restore Portic.sln
+          dotnet build Portic.sln -c Release --no-restore
+          dotnet test Portic.sln -c Release --no-build
+
+      - name: Tag ${{ env.TAG }}
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git fetch --tags --force --quiet
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            test "$(git rev-parse "$TAG^{commit}")" = "${{ needs.verify.outputs.sha }}" || exit 1
+          else
+            git tag "$TAG" "${{ needs.verify.outputs.sha }}"
+            git push origin "$TAG"
+          fi
+
+      - name: Pack Portic.Core
+        run: |
+          dotnet pack src/Portic.Core/Portic.Core.csproj \
+            -c Release \
+            -o artifacts \
+            -p:MinVerVersionOverride=${{ env.VERSION }}
+
+      - name: Build signed release and retrieve its package
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh workflow run release.yml --ref "$TAG"
+            RUN_ID=""
+            for attempt in $(seq 1 30); do
+              RUN_ID=$(gh run list --workflow release.yml --branch "$TAG" --event workflow_dispatch --json databaseId --jq '.[0].databaseId // empty')
+              test -z "$RUN_ID" || break
+              sleep 2
+            done
+            test -n "$RUN_ID"
+            gh run watch "$RUN_ID" --exit-status
+          fi
+          mkdir -p signed-artifacts
+          gh release download "$TAG" --pattern "Portic.Core.$VERSION.nupkg" --dir signed-artifacts
+          gh attestation verify "signed-artifacts/Portic.Core.$VERSION.nupkg" --repo "$GITHUB_REPOSITORY"
+
+      - name: NuGet login (Trusted Publishing)
+        if: ${{ !inputs.dry_run }}
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Push to nuget.org
+        if: ${{ !inputs.dry_run }}
+        run: |
+          dotnet nuget push "signed-artifacts/*.nupkg" \
+            --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+

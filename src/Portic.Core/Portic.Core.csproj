@@ -8,9 +8,19 @@
   -->
   <PropertyGroup>
     <RootNamespace>Portic.Core</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <PackageId>Portic.Core</PackageId>
+    <Description>Provider-neutral Portic gateway runtime: routing, governance, orchestration and content-free observability. Provider adapters implement the separate Portic.Sdk SPI.</Description>
+    <Authors>VEV Software ApS</Authors>
+    <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/Vev-software/portic-community</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MinVer" Version="8.0.0" PrivateAssets="all" />
+    <None Include="README.md" Pack="true" PackagePath="/" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />

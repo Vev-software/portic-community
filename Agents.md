@@ -69,6 +69,10 @@ governance, AI cost/policy, prompt libraries, AI audit.
 
 ## Working rules
 
+- `Portic.Core` is the only packable runtime project. Its version comes from MinVer
+  and `v` tags; never add a hand-maintained version. Run `pwsh scripts/Test-Package.ps1`
+  to verify the produced package in a separate consumer with public dependencies.
+
 - **Verify every change:** run build + test + lint + fitness before finishing. A change that makes a
   fitness test fail is wrong — fix the change, do not weaken the test.
 - **Contract-first:** if a change touches a boundary, update or add the contract/schema first, then
