@@ -54,9 +54,18 @@ governance, AI cost/policy, prompt libraries, AI audit.
 
 ## Licensing
 
-- This runtime: **AGPL-3.0**. Client SDKs / provider SPI / contracts: **Apache-2.0** (`portic-sdk`).
-- Do not relicense. Do not add a dependency whose licence is incompatible with AGPL-3.0 for the
-  runtime, or with Apache-2.0 for SDK/contract code. Flag any uncertain dependency instead of adding.
+- This runtime is **dual-licensed: AGPL-3.0 OR a commercial license from VEV** — the
+  established model, see [`LICENSING.md`](./LICENSING.md) and
+  [ADR-0006](./docs/adr/0006-dual-licensing-the-runtime.md). Client SDKs / provider SPI /
+  contracts stay **Apache-2.0** (`portic-sdk`).
+- The root `LICENSE` (verbatim AGPL-3.0) **must not be altered**. The commercial arm is
+  VEV's to grant; agents do not change it.
+- **Dual-licensing depends on the CLA.** Every contribution must be covered by
+  [`CLA.md`](./CLA.md) (see [`CONTRIBUTING.md`](./CONTRIBUTING.md)); a single AGPL-only
+  contribution would end VEV's ability to license the runtime commercially. Do not merge or
+  add contributions that are not CLA-covered.
+- Do not add a dependency whose licence is incompatible with AGPL-3.0 for the runtime, or
+  with Apache-2.0 for SDK/contract code. Flag any uncertain dependency instead of adding.
 
 ## Working rules
 
@@ -81,7 +90,9 @@ governance, AI cost/policy, prompt libraries, AI audit.
 
 ## Do NOT touch
 
-- Licensing headers, `LICENSE`, `NOTICE`, CLA files.
+- Licensing headers and the `LICENSE` file (verbatim AGPL-3.0). The dual-license model,
+  `LICENSING.md`, `NOTICE`, `CLA.md` and `CONTRIBUTING.md` are the established decision
+  (ADR-0005) — keep them consistent; do not weaken the CLA gate or the AGPL text.
 - CI dependency-rule / fitness workflows, except to strengthen them.
 - Anything under `portic-enterprise` (separate private repo) — it must never be a build dependency of
   this community repo (`02 §1.4`).
