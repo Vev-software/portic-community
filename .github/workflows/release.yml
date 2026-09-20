@@ -1,10 +1,22 @@
-# Auto-fires when the `release` workflow (publish.yml) pushes a vX.Y.Z tag. Creates the signed
-# GitHub Release and build-provenance attestations. Registry publishing lives in publish.yml.
+# Creates the signed GitHub Release and build-provenance attestations. Registry publishing lives
+# in publish.yml.
+#
+# TRIGGER: publish.yml dispatches this explicitly (workflow_dispatch) after it pushes the tag.
+# A tag pushed with the default GITHUB_TOKEN does NOT trigger another workflow (Actions
+# anti-recursion), so the `push: tags` trigger alone would silently never run for a one-button
+# release. The push trigger is kept for tags pushed by a human/PAT; the one-button flow uses
+# the explicit dispatch. See publish.yml.
 name: github release
 
 on:
   push:
     tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing vX.Y.Z tag to build the GitHub Release from"
+        required: true
+        type: string
 
 permissions:
   contents: read
