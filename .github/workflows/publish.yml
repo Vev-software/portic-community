@@ -4,7 +4,7 @@
 #   1. verify  (no gate)  — refuse unless on main; require the latest `ci` run for main's HEAD
 #                            to be green; compute the next version from the last tag + bump.
 #   2. release (environment: release, Required Reviewers) — pauses for your Approve click, then
-#      build+test again, push the tag `vX.Y.Z` (which fires release.yml -> GitHub Release), and
+#      build+test again, push the tag `vX.Y.Z`, dispatch release.yml (GitHub Release + SBOM), and
 #      publish Portic.Core to nuget.org via OIDC Trusted Publishing.
 #
 # WHY THIS FILE STAYS NAMED publish.yml: NuGet Trusted Publishing pins
@@ -105,6 +105,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
+      actions: write # dispatch release.yml explicitly (a GITHUB_TOKEN-pushed tag will not trigger it)
     env:
       VERSION: ${{ needs.verify.outputs.version }}
       TAG: ${{ needs.verify.outputs.tag }}
@@ -135,6 +136,15 @@ jobs:
             git tag "$TAG" "${{ needs.verify.outputs.sha }}"
             git push origin "$TAG"
           fi
+
+      # A tag pushed with GITHUB_TOKEN does not trigger release.yml's `push: tags` (Actions
+      # anti-recursion), so fire it explicitly. Without this the GitHub Release + SBOM +
+      # provenance are silently never created for a one-button release.
+      - name: Fire the GitHub Release workflow for ${{ env.TAG }}
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run release.yml --ref "$TAG" -f tag="$TAG"
 
       - name: Pack Portic.Core
         run: |
